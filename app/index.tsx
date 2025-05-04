@@ -11,6 +11,7 @@ import { useTextStyles } from "@/constants/TextStyles";
 import { useTheme } from "@/context/ThemeContext";
 import AppColors from "@/constants/AppColors";
 import { StatusBar } from 'expo-status-bar';
+import { useRouter } from 'expo-router';
 
 export default function Index() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -21,6 +22,7 @@ export default function Index() {
   const [modalVisible, setModalVisible] = useState(false);
   const textStyles = useTextStyles();
   const { colors, isDarkMode } = useTheme();
+  const router = useRouter();
   
   const today = dayjs().format('YYYY-MM-DD');
   const tomorrow = dayjs().add(1, 'day').format('YYYY-MM-DD');
@@ -98,23 +100,25 @@ export default function Index() {
       {/* Horizontal list of all events sorted by interested_people */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
         {sortedEvents.map(event => (
-          <View key={event.id} style={{ width: 220, marginRight: 12, borderWidth: 1, borderRadius: 8, padding: 8, backgroundColor: colors.surface, borderColor: colors.border }}>
-            {event.thumbnail_uri && (
-              <Image source={{ uri: event.thumbnail_uri }} style={{ width: 200, height: 120, borderRadius: 8 }} />
-            )}
-            <AppText style={{ fontWeight: 'bold', fontSize: 22, color: colors.text }}>{event.name}</AppText>
-            <AppText style={[textStyles.secondary]}>{event.date}</AppText>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, justifyContent: 'space-between' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="location" color={AppColors.Red} />
-                <AppText style={{ color: colors.text, marginLeft: 4 }}>{event.location_name}</AppText>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="people" color={AppColors.Red} />
-                <AppText style={{ color: colors.text, marginLeft: 4 }}>{event.interested_people}</AppText>
+          <TouchableOpacity key={event.id} onPress={() => router.push({ pathname: '/event/[id]', params: { id: String(event.id) } })}>
+            <View style={{ width: 220, marginRight: 12, borderWidth: 1, borderRadius: 8, padding: 8, backgroundColor: colors.surface, borderColor: colors.border }}>
+              {event.thumbnail_uri && (
+                <Image source={{ uri: event.thumbnail_uri }} style={{ width: 200, height: 120, borderRadius: 8 }} />
+              )}
+              <AppText style={{ fontWeight: 'bold', fontSize: 22, color: colors.text }}>{event.name}</AppText>
+              <AppText style={[textStyles.secondary]}>{event.date}</AppText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="location" color={AppColors.Red} />
+                  <AppText style={{ color: colors.text, marginLeft: 4 }}>{event.location_name}</AppText>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="people" color={AppColors.Red} />
+                  <AppText style={{ color: colors.text, marginLeft: 4 }}>{event.interested_people}</AppText>
+                </View>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
 

@@ -1,6 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Asset } from 'expo-asset';
 
 export const getDatabasePath = () => {
   return `${FileSystem.documentDirectory}SQLite/app.db`;
@@ -53,10 +54,8 @@ export const seedDatabase = async () => {
     'Rome',
     'Vienna',
     'Amsterdam',
-    'Prague',
     'Budapest',
     'Lisbon',
-    'Copenhagen',
   ];
   for (const city of cities) {
     const result = await db.runAsync('INSERT INTO City (name) VALUES (?)', [city]);
@@ -70,10 +69,8 @@ export const seedDatabase = async () => {
     { name: 'Colosseum', latitude: 41.8902, longitude: 12.4922, cityIndex: 3 }, // Rome
     { name: 'Schönbrunn Palace', latitude: 48.1845, longitude: 16.3122, cityIndex: 4 }, // Vienna
     { name: 'Rijksmuseum', latitude: 52.3599, longitude: 4.8852, cityIndex: 5 }, // Amsterdam
-    { name: 'Charles Bridge', latitude: 50.0865, longitude: 14.4114, cityIndex: 6 }, // Prague
-    { name: 'Buda Castle', latitude: 47.4969, longitude: 19.0399, cityIndex: 7 }, // Budapest
-    { name: 'Belém Tower', latitude: 38.6916, longitude: -9.2166, cityIndex: 8 }, // Lisbon
-    { name: 'Tivoli Gardens', latitude: 55.6736, longitude: 12.5681, cityIndex: 9 }, // Copenhagen
+    { name: 'Buda Castle', latitude: 47.4969, longitude: 19.0399, cityIndex: 6 }, // Budapest
+    { name: 'Belém Tower', latitude: 38.6916, longitude: -9.2166, cityIndex: 7 }, // Lisbon
   ];
   const locationIds: number[] = [];
   for (const loc of locations) {
@@ -91,15 +88,26 @@ export const seedDatabase = async () => {
     { name: 'Music Night', date: '2024-07-05', locationIndex: 3 },
     { name: 'Film Gala', date: '2024-08-12', locationIndex: 4 },
     { name: 'Book Fair', date: '2024-09-18', locationIndex: 5 },
-    { name: 'Jazz Fest', date: '2024-10-22', locationIndex: 6 },
-    { name: 'Wine Tasting', date: '2024-11-14', locationIndex: 7 },
-    { name: 'Marathon', date: '2024-12-01', locationIndex: 8 },
-    { name: 'Christmas Market', date: '2024-12-20', locationIndex: 9 },
+    { name: 'Wine Tasting', date: '2024-11-14', locationIndex: 6 },
+    { name: 'Marathon', date: '2024-12-01', locationIndex: 7 },
   ];
-  for (const event of events) {
+
+  const eventImages = [
+    require('../assets/images/locations/eiffel.jpg'),
+    require('../assets/images/locations/brandenburg.webp'),
+    require('../assets/images/locations/plazamayor.jpg'),
+    require('../assets/images/locations/coliseum.jpg'),
+    require('../assets/images/locations/schonbrunn.jpg'),
+    require('../assets/images/locations/rijksmuseum.jpg'),
+    require('../assets/images/locations/budacastle.jpg'),
+    require('../assets/images/locations/belemtower.jpg'),
+  ];
+
+  for (let i = 0; i < events.length; i++) {
+    const imageUri = await copyAssetToFileSystem(eventImages[i], `event_${i}.jpg`);
     await db.runAsync(
-      'INSERT INTO Event (name, date, location_id) VALUES (?, ?, ?)',
-      [event.name, event.date, locationIds[event.locationIndex]]
+      'INSERT INTO Event (name, date, location_id, thumbnail_uri) VALUES (?, ?, ?, ?)',
+      [events[i].name, events[i].date, locationIds[events[i].locationIndex], imageUri]
     );
   }
 };
@@ -176,3 +184,12 @@ export const deleteEvent = async (eventId: number) => {
   }
   return db.runAsync('DELETE FROM Event WHERE id = ?', [eventId]);
 };
+
+// Helper to copy asset to file system and return URI
+async function copyAssetToFileSystem(assetModule: any, filename: string) : Promise<string> {
+  const asset = Asset.fromModule(assetModule);
+  await asset.downloadAsync();
+  const dest = FileSystem.documentDirectory + filename;
+  await FileSystem.copyAsync({ from: asset.localUri!, to: dest });
+  return dest;
+}
