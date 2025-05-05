@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
+import AppColors from '@/constants/AppColors';
 
 export const useTextStyles = () => {
   const { colors } = useTheme();
@@ -19,6 +20,10 @@ export const useTextStyles = () => {
     body: {
       fontSize: 16,
       color: colors.text,
+    },
+    bodyEmphasized: {
+      fontSize: 16,
+      color: AppColors.Red,
     },
     small: {
       fontSize: 14,

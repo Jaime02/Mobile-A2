@@ -2,6 +2,8 @@ import * as SQLite from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Asset } from 'expo-asset';
+import Event from "@/database/models/event";
+import dayjs from "dayjs";
 
 export const getDatabasePath = () => {
   return `${FileSystem.documentDirectory}SQLite/app.db`;
@@ -16,8 +18,7 @@ export const resetDatabase = () => {
     DROP TABLE IF EXISTS Event;
     DROP TABLE IF EXISTS Location;
     DROP TABLE IF EXISTS City;
-  `);
-  db.execAsync(`
+
     CREATE TABLE IF NOT EXISTS City (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL
@@ -28,18 +29,18 @@ export const resetDatabase = () => {
       latitude REAL NOT NULL,
       longitude REAL NOT NULL,
       name TEXT NOT NULL,
-      city_id INTEGER NOT NULL,
-      FOREIGN KEY (city_id) REFERENCES City(id)
+      cityId INTEGER NOT NULL,
+      FOREIGN KEY (cityId) REFERENCES City(id)
     );
 
     CREATE TABLE IF NOT EXISTS Event (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       date DATETIME NOT NULL,
-      location_id INTEGER NOT NULL,
-      interested_people INTEGER DEFAULT 0,
-      thumbnail_uri TEXT,
-      FOREIGN KEY (location_id) REFERENCES Location(id)
+      locationId INTEGER NOT NULL,
+      interestedPeople INTEGER DEFAULT 0,
+      thumbnailUri TEXT,
+      FOREIGN KEY (locationId) REFERENCES Location(id)
     );
   `);
   console.log("Database reset successfully.");
@@ -75,21 +76,25 @@ export const seedDatabase = async () => {
   const locationIds: number[] = [];
   for (const loc of locations) {
     const result = await db.runAsync(
-      'INSERT INTO Location (latitude, longitude, name, city_id) VALUES (?, ?, ?, ?)',
+      'INSERT INTO Location (latitude, longitude, name, cityId) VALUES (?, ?, ?, ?)',
       [loc.latitude, loc.longitude, loc.name, cityIds[loc.cityIndex]]
     );
     locationIds.push(result.lastInsertRowId);
   }
+  
+  const today = dayjs().format('YYYY-MM-DD');
+  const tomorrow = dayjs().add(1, 'day').format('YYYY-MM-DD');
+  const nextWeek = dayjs().add(1, 'week').format('YYYY-MM-DD');
 
   const events = [
-    { name: 'Spring Festival', date: '2024-04-20', locationIndex: 0 },
-    { name: 'Art Expo', date: '2024-05-15', locationIndex: 1 },
-    { name: 'Food Carnival', date: '2024-06-10', locationIndex: 2 },
-    { name: 'Music Night', date: '2024-07-05', locationIndex: 3 },
-    { name: 'Film Gala', date: '2024-08-12', locationIndex: 4 },
-    { name: 'Book Fair', date: '2024-09-18', locationIndex: 5 },
-    { name: 'Wine Tasting', date: '2024-11-14', locationIndex: 6 },
-    { name: 'Marathon', date: '2024-12-01', locationIndex: 7 },
+    { name: 'Spring Festival', date: today, locationIndex: 0, interestedPeople: 33 },
+    { name: 'Art Expo', date: tomorrow, locationIndex: 1, interestedPeople: 420 },
+    { name: 'Food Carnival', date: today, locationIndex: 2, interestedPeople: 72 },
+    { name: 'Music Night', date: tomorrow, locationIndex: 3, interestedPeople: 69 },
+    { name: 'Film Gala', date: nextWeek, locationIndex: 4, interestedPeople: 88 },
+    { name: 'Book Fair', date: nextWeek, locationIndex: 5, interestedPeople: 1312 },
+    { name: 'Wine Tasting', date: today, locationIndex: 6, interestedPeople: 16 },
+    { name: 'Marathon', date: tomorrow, locationIndex: 7, interestedPeople: 1213 },
   ];
 
   const eventImages = [
@@ -106,8 +111,8 @@ export const seedDatabase = async () => {
   for (let i = 0; i < events.length; i++) {
     const imageUri = await copyAssetToFileSystem(eventImages[i], `event_${i}.jpg`);
     await db.runAsync(
-      'INSERT INTO Event (name, date, location_id, thumbnail_uri) VALUES (?, ?, ?, ?)',
-      [events[i].name, events[i].date, locationIds[events[i].locationIndex], imageUri]
+      'INSERT INTO Event (name, date, locationId, thumbnailUri, interestedPeople) VALUES (?, ?, ?, ?, ?)',
+      [events[i].name, events[i].date, locationIds[events[i].locationIndex], imageUri, events[i].interestedPeople]
     );
   }
 };
@@ -134,47 +139,47 @@ export const getCities = () => {
 // Location operations
 export const addLocation = (latitude: number, longitude: number, name: string, cityId: number) => {
   return db.runAsync(
-    'INSERT INTO Location (latitude, longitude, name, city_id) VALUES (?, ?, ?, ?)',
+    'INSERT INTO Location (latitude, longitude, name, cityId) VALUES (?, ?, ?, ?)',
     [latitude, longitude, name, cityId]
   );
 };
 
 export const getLocations = () => {
   return db.getAllAsync(`
-    SELECT l.*, c.name as city_name 
+    SELECT l.*, c.name as cityName 
     FROM Location l
-    JOIN City c ON l.city_id = c.id
+    JOIN City c ON l.cityId = c.id
   `);
 };
 
 export const addEvent = async (name: string, date: string, locationId: number, imageUri?: string) => {
   // Directly store the image URI (no manipulation)
   return db.runAsync(
-    'INSERT INTO Event (name, date, location_id, thumbnail_uri) VALUES (?, ?, ?, ?)',
+    'INSERT INTO Event (name, date, locationId, thumbnailUri) VALUES (?, ?, ?, ?)',
     [name, date, locationId, imageUri || null]
   );
 };
 
-export const getEvents = () => {
+export function getEvents(): Promise<Event[]> {
   return db.getAllAsync(`
-    SELECT e.*, l.name as location_name, l.latitude, l.longitude, c.name as city_name
+    SELECT e.*, l.name as locationName, l.latitude, l.longitude, c.name as cityName
     FROM Event e
-    JOIN Location l ON e.location_id = l.id
-    JOIN City c ON l.city_id = c.id
+    JOIN Location l ON e.locationId = l.id
+    JOIN City c ON l.cityId = c.id
   `);
 };
 
 export const updateInterestedPeople = (eventId: number, count: number) => {
   return db.runAsync(
-    'UPDATE Event SET interested_people = ? WHERE id = ?',
+    'UPDATE Event SET interestedPeople = ? WHERE id = ?',
     [count, eventId]
   );
 };
 
 export const deleteEvent = async (eventId: number) => {
-  // Get the event and check for thumbnail_uri
-  const event = await db.getFirstAsync('SELECT thumbnail_uri FROM Event WHERE id = ?', [eventId]);
-  const uri = (event as { thumbnail_uri?: string })?.thumbnail_uri;
+  // Get the event and check for thumbnailUri
+  const event = await db.getFirstAsync('SELECT thumbnailUri FROM Event WHERE id = ?', [eventId]);
+  const uri = (event as { thumbnailUri?: string })?.thumbnailUri;
   if (uri) {
     try {
       await FileSystem.deleteAsync(uri);

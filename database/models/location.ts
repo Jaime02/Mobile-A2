@@ -3,5 +3,5 @@ export default interface Location {
   latitude: number;
   longitude: number;
   name: string;
-  city_id: number;
+  cityId: number;
 } 
