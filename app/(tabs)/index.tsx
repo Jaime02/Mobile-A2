@@ -1,5 +1,11 @@
 import { View, ScrollView, Image, TouchableOpacity } from "react-native";
-import { useState, useCallback, useEffect, useMemo } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useLayoutEffect,
+} from "react";
 import { getEvents, initializeDatabaseIfNeeded } from "@/database/database";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
@@ -11,12 +17,14 @@ import AppColors from "@/constants/AppColors";
 import { StatusBar } from "expo-status-bar";
 import { useRouter, useFocusEffect } from "expo-router";
 import EventListSection from "@/components/EventList";
+import { useNavigation } from "expo-router";
 
 export default function Index() {
   const [events, setEvents] = useState<Event[]>([]);
   const textStyles = useTextStyles();
   const { colors, isDarkMode } = useTheme();
   const router = useRouter();
+  const navigation = useNavigation();
 
   const today = dayjs().format("YYYY-MM-DD");
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
@@ -60,21 +68,26 @@ export default function Index() {
     }, [loadEvents])
   );
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "EVENTS",
+      headerRight: () => (
+        <TouchableOpacity onPress={() => router.push("/event/create")}>
+          <Ionicons name="add-circle" size={28} color={AppColors.Red} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
   return (
     <ScrollView
-      style={{ flex: 1, padding: 20, backgroundColor: colors.background }}
+      style={{ flex: 1, padding: 10, backgroundColor: colors.background }}
       contentContainerStyle={{ gap: 10 }}
     >
       <StatusBar
         style={isDarkMode ? "light" : "dark"}
         backgroundColor={colors.background}
       />
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <AppText style={{ ...textStyles.heading, flex: 1 }}>EVENTS</AppText>
-        <TouchableOpacity onPress={() => router.push("/event/create")}>
-          <Ionicons name="add-circle" size={36} color={AppColors.Red} />
-        </TouchableOpacity>
-      </View>
       <AppText style={{ ...textStyles.heading }}>Popular</AppText>
       <ScrollView
         horizontal

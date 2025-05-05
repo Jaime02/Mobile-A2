@@ -104,7 +104,7 @@ export default function CreateEventScreen() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{ padding: 20 }}
+      contentContainerStyle={{ padding: 10, paddingTop: 40, gap: 10 }}
     >
       <StatusBar
         style={isDarkMode ? "light" : "dark"}
@@ -114,7 +114,6 @@ export default function CreateEventScreen() {
         style={{
           fontSize: 24,
           fontWeight: "bold",
-          marginBottom: 20,
           color: colors.text,
           alignSelf: "center",
         }}
@@ -122,82 +121,76 @@ export default function CreateEventScreen() {
         Add New Event
       </AppText>
 
-      <View style={{ marginBottom: 20 }}>
-        <TextInput
-          style={{
-            borderWidth: 1,
-            padding: 12,
-            marginBottom: 15,
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-            color: colors.text,
-            borderRadius: 5,
-          }}
-          placeholder="Event Name"
-          placeholderTextColor={colors.textSecondary}
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          style={{
-            borderWidth: 1,
-            padding: 12,
-            marginBottom: 15,
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-            color: colors.text,
-            borderRadius: 5,
-          }}
-          placeholder="Date (YYYY-MM-DD HH:MM)" // TODO: Use a DateTimePicker component
-          placeholderTextColor={colors.textSecondary}
-          value={date}
-          onChangeText={setDate}
-        />
-        <TextInput
-          style={{
-            borderWidth: 1,
-            padding: 12,
-            marginBottom: 15,
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-            color: colors.text,
-            borderRadius: 5,
-          }}
-          placeholder="Location ID" // TODO: replace with a Picker or Searchable Dropdown
-          placeholderTextColor={colors.textSecondary}
-          value={locationInput}
-          onChangeText={handleLocationInputChange}
-          keyboardType="numeric" // Set keyboard type to numeric
-        />
+      <TextInput
+        style={{
+          borderWidth: 1,
+          padding: 12,
 
-        <View style={{ marginBottom: 15 }}>
-          <Button
-            title="Pick Event Image"
-            onPress={pickImage}
-            color={AppColors.Red}
-          />
-        </View>
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          color: colors.text,
+          borderRadius: 5,
+        }}
+        placeholder="Event Name"
+        placeholderTextColor={colors.textSecondary}
+        value={name}
+        onChangeText={setName}
+      />
+      <TextInput
+        style={{
+          borderWidth: 1,
+          padding: 12,
 
-        {imageUri && (
-          <Image
-            source={{ uri: imageUri }}
-            style={{
-              width: "100%",
-              height: 200,
-              resizeMode: "contain",
-              marginVertical: 15,
-              borderRadius: 5,
-              alignSelf: "center",
-            }}
-          />
-        )}
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          color: colors.text,
+          borderRadius: 5,
+        }}
+        placeholder="Date (YYYY-MM-DD HH:MM)" // TODO: Use a DateTimePicker component
+        placeholderTextColor={colors.textSecondary}
+        value={date}
+        onChangeText={setDate}
+      />
+      <TextInput
+        style={{
+          borderWidth: 1,
+          padding: 12,
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          color: colors.text,
+          borderRadius: 5,
+        }}
+        placeholder="Location ID" // TODO: replace with a Picker or Searchable Dropdown
+        placeholderTextColor={colors.textSecondary}
+        value={locationInput}
+        onChangeText={handleLocationInputChange}
+        keyboardType="numeric" // Set keyboard type to numeric
+      />
 
-        <Button
-          title="Add Event"
-          onPress={handleAddEvent}
-          color={AppColors.Red}
+      <Button
+        title="Pick Event Image"
+        onPress={pickImage}
+        color={AppColors.Red}
+      />
+
+      {imageUri && (
+        <Image
+          source={{ uri: imageUri }}
+          style={{
+            width: "100%",
+            height: 200,
+            resizeMode: "contain",
+            borderRadius: 5,
+            alignSelf: "center",
+          }}
         />
-      </View>
+      )}
+
+      <Button
+        title="Add Event"
+        onPress={handleAddEvent}
+        color={AppColors.Red}
+      />
 
       <Button
         title="Cancel"
