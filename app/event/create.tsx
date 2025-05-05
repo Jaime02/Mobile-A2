@@ -1,11 +1,11 @@
 import {
-  View,
   Button,
   TextInput,
   Image,
   Alert,
   ScrollView,
   Platform,
+  View,
 } from "react-native";
 import { useState } from "react";
 import { addEvent } from "@/database/database";
@@ -15,12 +15,17 @@ import AppText from "@/components/AppText";
 import { useTheme } from "@/context/ThemeContext";
 import AppColors from "@/constants/AppColors";
 import { StatusBar } from "expo-status-bar";
+import { Picker } from "@react-native-picker/picker";
+import { useEffect } from "react";
+import { getLocations } from "@/database/database";
+import Location from "@/database/models/location";
 
 export default function CreateEventScreen() {
   const [name, setName] = useState("");
-  const [date, setDate] = useState(""); // Consider using a DateTimePicker
+  const [date, setDate] = useState("");
   const [locationId, setLocationId] = useState<number | null>(null);
-  const [locationInput, setLocationInput] = useState("");
+  const [locations, setLocations] = useState<Location[]>([]);
+
   const [imageUri, setImageUri] = useState<string | null>(null);
   const router = useRouter();
   const { colors, isDarkMode } = useTheme();
@@ -53,7 +58,11 @@ export default function CreateEventScreen() {
 
   const handleAddEvent = async () => {
     // Basic validation
-    const parsedLocationId = parseInt(locationInput, 10);
+    if (!locationId) {
+      Alert.alert("Validation Error", "Please select a location.");
+      return;
+    }
+    
     if (!name.trim()) {
       Alert.alert("Validation Error", "Please enter an event name.");
       return;
@@ -66,19 +75,11 @@ export default function CreateEventScreen() {
       );
       return;
     }
-    if (isNaN(parsedLocationId)) {
-      Alert.alert(
-        "Validation Error",
-        "Please enter a valid Location ID (numeric)."
-      );
-      return;
-    }
-    setLocationId(parsedLocationId); // Set the actual number state
 
     // Proceed if validation passes
-    if (name && date && !isNaN(parsedLocationId)) {
+    if (name && date && locationId) {
       try {
-        await addEvent(name, date, parsedLocationId, imageUri || undefined);
+        await addEvent(name, date, locationId, imageUri || undefined);
         Alert.alert("Success", "Event added successfully!");
         // Navigate back to the previous screen (likely the events list)
         if (router.canGoBack()) {
@@ -94,17 +95,18 @@ export default function CreateEventScreen() {
     }
   };
 
-  const handleLocationInputChange = (text: string) => {
-    setLocationInput(text);
-    // Try parsing immediately or wait until submission
-    // const parsed = parseInt(text, 10);
-    // setLocationId(isNaN(parsed) ? null : parsed);
-  };
+  useEffect(() => {
+    const fetchLocations = async () => {
+      const result = await getLocations();
+      setLocations(result);
+    };
+    fetchLocations();
+  }, []);
 
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{ padding: 10, paddingTop: 40, gap: 10 }}
+      contentContainerStyle={{ gap: 10 }}
     >
       <StatusBar
         style={isDarkMode ? "light" : "dark"}
@@ -151,22 +153,30 @@ export default function CreateEventScreen() {
         value={date}
         onChangeText={setDate}
       />
-      <TextInput
+      <View
         style={{
           borderWidth: 1,
-          padding: 12,
-          backgroundColor: colors.surface,
           borderColor: colors.border,
-          color: colors.text,
           borderRadius: 5,
+          backgroundColor: colors.surface,
         }}
-        placeholder="Location ID" // TODO: replace with a Picker or Searchable Dropdown
-        placeholderTextColor={colors.textSecondary}
-        value={locationInput}
-        onChangeText={handleLocationInputChange}
-        keyboardType="numeric" // Set keyboard type to numeric
-      />
-
+      >
+        <Picker
+          selectedValue={locationId}
+          onValueChange={(itemValue) => setLocationId(itemValue)}
+          dropdownIconColor={colors.text}
+          style={{ color: colors.text }}
+        >
+          <Picker.Item label="Select Location..." value={null} />
+          {locations.map((loc) => (
+            <Picker.Item
+              key={loc.id}
+              label={`${loc.name} (${loc.cityName})`}
+              value={loc.id}
+            />
+          ))}
+        </Picker>
+      </View>
       <Button
         title="Pick Event Image"
         onPress={pickImage}

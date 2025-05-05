@@ -105,14 +105,14 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
   },
   section: {
-    marginBottom: 30,
+    marginBottom: 10,
   },
   sectionTitle: {
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   switchContainer: {
     flexDirection: 'row',

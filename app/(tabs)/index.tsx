@@ -81,13 +81,9 @@ export default function Index() {
 
   return (
     <ScrollView
-      style={{ flex: 1, padding: 10, backgroundColor: colors.background }}
-      contentContainerStyle={{ gap: 10 }}
+      style={{ flex: 1, paddingHorizontal: 10, backgroundColor: colors.background }}
+      contentContainerStyle={{ gap: 10, paddingBottom: 20 }}
     >
-      <StatusBar
-        style={isDarkMode ? "light" : "dark"}
-        backgroundColor={colors.background}
-      />
       <AppText style={{ ...textStyles.heading }}>Popular</AppText>
       <ScrollView
         horizontal
