@@ -6,4 +6,5 @@ export default interface Event {
   cityName: string;
   interestedPeople: number;
   thumbnailUri: string | null;
+  description: string;
 }

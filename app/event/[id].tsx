@@ -1,4 +1,12 @@
-import { View, Image, ScrollView, Platform } from "react-native";
+import {
+  View,
+  Image,
+  ScrollView,
+  Platform,
+  Alert,
+  TouchableOpacity,
+  Button,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { getEvents } from "@/database/database";
@@ -7,11 +15,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/context/ThemeContext";
 import AppColors from "@/constants/AppColors";
 import { Linking } from "react-native";
+import { useTextStyles } from "@/constants/TextStyles";
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
-  const [event, setEvent] = useState<any>(null);
+  const [event, setEvent] = useState<any>();
   const { colors } = useTheme();
+  const textStyles = useTextStyles();
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -35,6 +45,19 @@ export default function EventDetailScreen() {
     );
   };
 
+  const buyTickets = async () => {
+    // Check if the device can open the best URL available on the internet :D
+    const youtubeUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+    if (await Linking.canOpenURL(youtubeUrl)) {
+      // Open the URL
+      await Linking.openURL(youtubeUrl);
+    } else {
+      console.error(`Don't know how to open this URL: ${youtubeUrl}`);
+      Alert.alert(`Don't know how to open this URL: ${youtubeUrl}`);
+    }
+  };
+
   if (!event) {
     return (
       <View
@@ -52,7 +75,8 @@ export default function EventDetailScreen() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: colors.background, padding: 20 }}
+      style={{ flex: 1, backgroundColor: colors.background, padding: 10 }}
+      contentContainerStyle={{ gap: 10 }}
     >
       {event.thumbnailUri && (
         <Image
@@ -61,7 +85,6 @@ export default function EventDetailScreen() {
             width: "100%",
             height: 220,
             borderRadius: 12,
-            marginBottom: 20,
           }}
         />
       )}
@@ -70,33 +93,46 @@ export default function EventDetailScreen() {
           fontSize: 28,
           fontWeight: "bold",
           color: colors.text,
-          marginBottom: 10,
         }}
       >
         {event.name}
       </AppText>
-      <AppText style={{ color: colors.text, marginBottom: 10 }}>
+      <AppText style={{ color: colors.text }}>
         <Ionicons name="calendar" color={AppColors.Red} /> {event.date}
       </AppText>
       <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+        }}
       >
         <Ionicons name="location" color={AppColors.Red} />
         <AppText style={{ color: colors.text, marginLeft: 6 }}>
-          {event.locationName}
+          {event.cityName} - {event.locationName}
         </AppText>
       </View>
       <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+        }}
       >
         <Ionicons name="people" color={AppColors.Red} />
         <AppText style={{ color: colors.text, marginLeft: 6 }}>
           {event.interestedPeople} interested
         </AppText>
       </View>
-      <AppText style={{ color: colors.textSecondary, marginTop: 20 }}>
-        City: {event.cityName}
-      </AppText>
+      <AppText style={textStyles.body}>{event.description}</AppText>
+      <Button
+        title="I'm interested"
+        onPress={() => Alert.alert("To do :)")}
+        color={AppColors.Red}
+      />
+      <Button
+        title="Buy tickets! 🤪"
+        onPress={buyTickets}
+        color={AppColors.Red}
+      />
     </ScrollView>
   );
 }

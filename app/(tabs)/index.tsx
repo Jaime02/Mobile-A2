@@ -21,17 +21,21 @@ export default function Index() {
   const today = dayjs().format("YYYY-MM-DD");
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
 
+  const sortByPopularity = (a: Event, b: Event) =>
+    b.interestedPeople - a.interestedPeople;
+
   // Memoize filtered/sorted lists to prevent recalculation on every render
   const popularEvents: Event[] = useMemo(
-    () => [...events].sort((a, b) => b.interestedPeople - a.interestedPeople).slice(0, 6),
+    () => [...events].sort(sortByPopularity).slice(0, 6),
     [events]
   );
   const todayEvents: Event[] = useMemo(
-    () => events.filter((e) => e.date.startsWith(today)),
+    () => events.filter((e) => e.date.startsWith(today)).sort(sortByPopularity),
     [events, today]
   );
   const tomorrowEvents: Event[] = useMemo(
-    () => events.filter((e) => e.date.startsWith(tomorrow)),
+    () =>
+      events.filter((e) => e.date.startsWith(tomorrow)).sort(sortByPopularity),
     [events, tomorrow]
   );
 
@@ -59,27 +63,23 @@ export default function Index() {
   return (
     <ScrollView
       style={{ flex: 1, padding: 20, backgroundColor: colors.background }}
+      contentContainerStyle={{ gap: 10 }}
     >
       <StatusBar
         style={isDarkMode ? "light" : "dark"}
         backgroundColor={colors.background}
       />
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
-      >
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
         <AppText style={{ ...textStyles.heading, flex: 1 }}>EVENTS</AppText>
         <TouchableOpacity onPress={() => router.push("/event/create")}>
           <Ionicons name="add-circle" size={36} color={AppColors.Red} />
         </TouchableOpacity>
       </View>
-
-      <AppText style={{ ...textStyles.heading, marginBottom: 8 }}>
-        Popular
-      </AppText>
+      <AppText style={{ ...textStyles.heading }}>Popular</AppText>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ marginBottom: 5, height: 220 }}
+        contentContainerStyle={{ gap: 10 }}
       >
         {popularEvents.length === 0 && (
           <AppText
@@ -106,13 +106,13 @@ export default function Index() {
             <View
               style={{
                 width: 220,
-                marginRight: 12,
                 borderWidth: 1,
                 borderRadius: 8,
                 padding: 10,
                 backgroundColor: colors.surface,
                 borderColor: colors.border,
                 height: "100%",
+                gap: 2,
               }}
             >
               {event.thumbnailUri ? (
@@ -129,9 +129,7 @@ export default function Index() {
                 <View
                   style={{
                     width: "100%",
-                    height: 100,
                     borderRadius: 4,
-                    marginBottom: 8,
                     backgroundColor: colors.border,
                     justifyContent: "center",
                     alignItems: "center",
@@ -175,7 +173,6 @@ export default function Index() {
                     flexDirection: "row",
                     alignItems: "center",
                     flex: 1,
-                    marginRight: 4,
                   }}
                 >
                   <Ionicons name="location" color={AppColors.Red} size={14} />

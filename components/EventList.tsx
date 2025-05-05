@@ -26,7 +26,7 @@ export default function EventListSection({
   return (
     <>
       <AppText
-        style={{ ...textStyles.heading, marginBottom: 8, marginTop: 15 }}
+        style={{ ...textStyles.heading }}
       >
         {title}
       </AppText>

@@ -40,6 +40,7 @@ export const resetDatabase = () => {
       locationId INTEGER NOT NULL,
       interestedPeople INTEGER DEFAULT 0,
       thumbnailUri TEXT,
+      description TEXT,
       FOREIGN KEY (locationId) REFERENCES Location(id)
     );
   `);
@@ -87,14 +88,14 @@ export const seedDatabase = async () => {
   const nextWeek = dayjs().add(1, 'week').format('YYYY-MM-DD');
 
   const events = [
-    { name: 'Spring Festival', date: today, locationIndex: 0, interestedPeople: 33 },
-    { name: 'Art Expo', date: tomorrow, locationIndex: 1, interestedPeople: 420 },
-    { name: 'Food Carnival', date: today, locationIndex: 2, interestedPeople: 72 },
-    { name: 'Music Night', date: tomorrow, locationIndex: 3, interestedPeople: 69 },
-    { name: 'Film Gala', date: nextWeek, locationIndex: 4, interestedPeople: 88 },
-    { name: 'Book Fair', date: nextWeek, locationIndex: 5, interestedPeople: 1312 },
-    { name: 'Wine Tasting', date: today, locationIndex: 6, interestedPeople: 16 },
-    { name: 'Marathon', date: tomorrow, locationIndex: 7, interestedPeople: 1213 },
+    { name: 'Spring Festival', date: today, locationIndex: 0, interestedPeople: 33, description: "Flowerpower man! Prepare for questionable fashion choices and excessive flower crowns." },
+    { name: 'Art Expo', date: tomorrow, locationIndex: 1, interestedPeople: 420, description: "Where 'abstract' means 'I spilled paint and called it a masterpiece'. Free cheese cubes!" },
+    { name: 'Food Carnival', date: today, locationIndex: 2, interestedPeople: 72, description: "Come for the food, stay because you ate too much and can't move." },
+    { name: 'Music Night', date: tomorrow, locationIndex: 3, interestedPeople: 69, description: "Featuring bands you've never heard of, but whose parents are *very* proud." },
+    { name: 'Film Gala', date: nextWeek, locationIndex: 4, interestedPeople: 88, description: "Watch movies so independent, they haven't even been seen by the director." },
+    { name: 'Book Fair', date: nextWeek, locationIndex: 5, interestedPeople: 1312, description: "Warning: May result in purchasing more books than you can read in a lifetime." },
+    { name: 'Wine Tasting', date: today, locationIndex: 6, interestedPeople: 16, description: "Sample wines and pretend you know the difference between 'oaky' and 'just okay'." },
+    { name: 'Marathon', date: tomorrow, locationIndex: 7, interestedPeople: 1213, description: "Running 26.2 miles just to get a free banana at the end. Seems fair." },
   ];
 
   const eventImages = [
@@ -109,10 +110,11 @@ export const seedDatabase = async () => {
   ];
 
   for (let i = 0; i < events.length; i++) {
+    let event = events[i];
     const imageUri = await copyAssetToFileSystem(eventImages[i], `event_${i}.jpg`);
     await db.runAsync(
-      'INSERT INTO Event (name, date, locationId, thumbnailUri, interestedPeople) VALUES (?, ?, ?, ?, ?)',
-      [events[i].name, events[i].date, locationIds[events[i].locationIndex], imageUri, events[i].interestedPeople]
+      'INSERT INTO Event (name, date, locationId, thumbnailUri, interestedPeople, description) VALUES (?, ?, ?, ?, ?, ?)',
+      [event.name, event.date, locationIds[event.locationIndex], imageUri, event.interestedPeople, event.description]
     );
   }
 };
