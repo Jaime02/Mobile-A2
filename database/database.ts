@@ -262,12 +262,12 @@ export const addEvent = async (
   name: string,
   date: string,
   locationId: number,
-  imageUri?: string
+  imageUri?: string,
+  description?: string
 ) => {
-  // Directly store the image URI (no manipulation)
   return db.runAsync(
-    "INSERT INTO Event (name, date, locationId, thumbnailUri) VALUES (?, ?, ?, ?)",
-    [name, date, locationId, imageUri || null]
+    "INSERT INTO Event (name, date, locationId, thumbnailUri, description) VALUES (?, ?, ?, ?, ?)",
+    [name, date, locationId, imageUri || null, description || null]
   );
 };
 

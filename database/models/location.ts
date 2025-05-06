@@ -4,4 +4,4 @@ export default interface Location {
   longitude: number;
   name: string;
   cityId: number;
-} 
+}

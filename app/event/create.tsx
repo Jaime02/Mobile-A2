@@ -23,6 +23,7 @@ import Location from "@/database/models/location";
 export default function CreateEventScreen() {
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
+  const [description, setDescription] = useState("");
   const [locationId, setLocationId] = useState<number | null>(null);
   const [locations, setLocations] = useState<Location[]>([]);
 
@@ -62,13 +63,12 @@ export default function CreateEventScreen() {
       Alert.alert("Validation Error", "Please select a location.");
       return;
     }
-    
+
     if (!name.trim()) {
       Alert.alert("Validation Error", "Please enter an event name.");
       return;
     }
     if (!date.trim()) {
-      // Add more robust date validation if needed
       Alert.alert(
         "Validation Error",
         "Please enter a date (YYYY-MM-DD HH:MM)."
@@ -79,7 +79,13 @@ export default function CreateEventScreen() {
     // Proceed if validation passes
     if (name && date && locationId) {
       try {
-        await addEvent(name, date, locationId, imageUri || undefined);
+        await addEvent(
+          name,
+          date,
+          locationId,
+          imageUri || undefined,
+          description
+        );
         Alert.alert("Success", "Event added successfully!");
         // Navigate back to the previous screen (likely the events list)
         if (router.canGoBack()) {
@@ -127,7 +133,6 @@ export default function CreateEventScreen() {
         style={{
           borderWidth: 1,
           padding: 12,
-
           backgroundColor: colors.surface,
           borderColor: colors.border,
           color: colors.text,
@@ -142,16 +147,33 @@ export default function CreateEventScreen() {
         style={{
           borderWidth: 1,
           padding: 12,
-
           backgroundColor: colors.surface,
           borderColor: colors.border,
           color: colors.text,
           borderRadius: 5,
         }}
-        placeholder="Date (YYYY-MM-DD HH:MM)" // TODO: Use a DateTimePicker component
+        placeholder="Date (YYYY-MM-DD HH:MM)"
         placeholderTextColor={colors.textSecondary}
         value={date}
         onChangeText={setDate}
+      />
+      <TextInput
+        style={{
+          borderWidth: 1,
+          padding: 12,
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          color: colors.text,
+          borderRadius: 5,
+          minHeight: 100,
+          textAlignVertical: "top",
+        }}
+        placeholder="Event Description (Optional)"
+        placeholderTextColor={colors.textSecondary}
+        value={description}
+        onChangeText={setDescription}
+        multiline={true}
+        numberOfLines={4}
       />
       <View
         style={{
@@ -159,13 +181,14 @@ export default function CreateEventScreen() {
           borderColor: colors.border,
           borderRadius: 5,
           backgroundColor: colors.surface,
+          justifyContent: "center",
         }}
       >
         <Picker
           selectedValue={locationId}
           onValueChange={(itemValue) => setLocationId(itemValue)}
           dropdownIconColor={colors.text}
-          style={{ color: colors.text }}
+          style={{ color: colors.text, height: 50 }}
         >
           <Picker.Item label="Select Location..." value={null} />
           {locations.map((loc) => (
