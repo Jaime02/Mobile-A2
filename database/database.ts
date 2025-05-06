@@ -13,6 +13,8 @@ export const getDatabasePath = () => {
 // Open the database
 const db = SQLite.openDatabaseSync("app.db");
 
+const DB_DATE_FORMAT = "YYYY-MM-DD HH:mm";
+
 // Function to reset the database by dropping and recreating tables
 export const resetDatabase = () => {
   db.execAsync(`
@@ -116,14 +118,14 @@ export const seedDatabase = async () => {
     locationIds.push(result.lastInsertRowId);
   }
 
-  const today = dayjs().format("YYYY-MM-DD");
-  const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
-  const nextWeek = dayjs().add(1, "week").format("YYYY-MM-DD");
+  const today = dayjs();
+  const tomorrow = dayjs().add(1, "day");
+  const nextWeek = dayjs().add(1, "week");
 
   const events = [
     {
       name: "Spring Festival",
-      date: today,
+      date: today.format(DB_DATE_FORMAT),
       locationIndex: 0,
       interestedPeople: 33,
       description:
@@ -131,7 +133,7 @@ export const seedDatabase = async () => {
     },
     {
       name: "Art Expo",
-      date: tomorrow,
+      date: tomorrow.add(1, "hour").format(DB_DATE_FORMAT),
       locationIndex: 1,
       interestedPeople: 420,
       description:
@@ -139,7 +141,7 @@ export const seedDatabase = async () => {
     },
     {
       name: "Food Carnival",
-      date: today,
+      date: today.add(8, "hour").format(DB_DATE_FORMAT),
       locationIndex: 2,
       interestedPeople: 72,
       description:
@@ -147,7 +149,7 @@ export const seedDatabase = async () => {
     },
     {
       name: "Music Night",
-      date: tomorrow,
+      date: tomorrow.add(6, "hour").format(DB_DATE_FORMAT),
       locationIndex: 3,
       interestedPeople: 69,
       description:
@@ -155,7 +157,7 @@ export const seedDatabase = async () => {
     },
     {
       name: "Film Gala",
-      date: nextWeek,
+      date: nextWeek.add(10, "hour").format(DB_DATE_FORMAT),
       locationIndex: 4,
       interestedPeople: 88,
       description:
@@ -163,7 +165,7 @@ export const seedDatabase = async () => {
     },
     {
       name: "Book Fair",
-      date: nextWeek,
+      date: nextWeek.add(2, "hour").format(DB_DATE_FORMAT),
       locationIndex: 5,
       interestedPeople: 1312,
       description:
@@ -171,7 +173,7 @@ export const seedDatabase = async () => {
     },
     {
       name: "Wine Tasting",
-      date: today,
+      date: today.add(10, "hour").format(DB_DATE_FORMAT),
       locationIndex: 6,
       interestedPeople: 16,
       description:
@@ -179,7 +181,7 @@ export const seedDatabase = async () => {
     },
     {
       name: "Marathon",
-      date: tomorrow,
+      date: tomorrow.format(DB_DATE_FORMAT),
       locationIndex: 7,
       interestedPeople: 1213,
       description:
