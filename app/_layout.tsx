@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 SplashScreen.preventAutoHideAsync();
 
 const customFonts = {
-  MainFont: require("../assets/fonts/alternategothicno1.otf"),
+  "MainFont": require("../assets/fonts/alternategothicno1.otf"),
 };
 
 export default function RootLayout() {

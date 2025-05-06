@@ -1,4 +1,4 @@
-import { View, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, ScrollView, Image, TouchableOpacity, Text } from "react-native";
 import {
   useState,
   useCallback,
@@ -14,15 +14,15 @@ import AppText from "@/components/AppText";
 import { useTextStyles } from "@/constants/TextStyles";
 import { useTheme } from "@/context/ThemeContext";
 import AppColors from "@/constants/AppColors";
-import { StatusBar } from "expo-status-bar";
 import { useRouter, useFocusEffect } from "expo-router";
 import EventListSection from "@/components/EventList";
 import { useNavigation } from "expo-router";
+import Header from "@/components/Header";
 
 export default function Index() {
   const [events, setEvents] = useState<Event[]>([]);
   const textStyles = useTextStyles();
-  const { colors, isDarkMode } = useTheme();
+  const { colors } = useTheme();
   const router = useRouter();
   const navigation = useNavigation();
 
@@ -53,12 +53,12 @@ export default function Index() {
   const upcomingEvents: Event[] = useMemo(() => {
     // Create a set of IDs for events already displayed
     const displayedEventIds = new Set([
-      ...todayEvents.map(event => event.id),
-      ...tomorrowEvents.map(event => event.id),
+      ...todayEvents.map((event) => event.id),
+      ...tomorrowEvents.map((event) => event.id),
     ]);
 
     // Filter out events whose IDs are in the displayedEventIds set
-    return events.filter(event => !displayedEventIds.has(event.id));
+    return events.filter((event) => !displayedEventIds.has(event.id));
   }, [events, todayEvents, tomorrowEvents]);
 
   const loadEvents = useCallback(async () => {
@@ -84,7 +84,7 @@ export default function Index() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: "EVENTS",
+      headerTitle: () => (<Header headerText="EVENTS"></Header>),
       headerRight: () => (
         <TouchableOpacity onPress={() => router.push("/event/create")}>
           <Ionicons name="add-circle" size={28} color={AppColors.Red} />
@@ -95,10 +95,14 @@ export default function Index() {
 
   return (
     <ScrollView
-      style={{ flex: 1, paddingHorizontal: 10, backgroundColor: colors.background }}
+      style={{
+        flex: 1,
+        paddingHorizontal: 10,
+        backgroundColor: colors.background,
+      }}
       contentContainerStyle={{ gap: 10, paddingBottom: 20 }}
     >
-      <AppText style={{ ...textStyles.heading }}>Popular</AppText>
+      <AppText style={textStyles.heading}>Popular</AppText>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

@@ -88,26 +88,26 @@ export default function EventDetailScreen() {
           }}
         />
       )}
-      <AppText
-        style={{
-          fontSize: 28,
-          fontWeight: "bold",
-          color: colors.text,
-        }}
-      >
-        {event.name}
-      </AppText>
-      <AppText style={{ color: colors.text }}>
-        <Ionicons name="calendar" color={AppColors.Red} /> {event.date}
-      </AppText>
+      <AppText style={textStyles.heading}>{event.name}</AppText>
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
+          gap: 10,
         }}
       >
-        <Ionicons name="location" color={AppColors.Red} />
-        <AppText style={{ color: colors.text, marginLeft: 6 }}>
+        <Ionicons name="calendar" color={AppColors.Red} size={16} />
+        <AppText style={textStyles.body}>{event.date}</AppText>
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <Ionicons name="location" color={AppColors.Red} size={16} />
+        <AppText style={textStyles.body}>
           {event.cityName} - {event.locationName}
         </AppText>
       </View>
@@ -115,10 +115,11 @@ export default function EventDetailScreen() {
         style={{
           flexDirection: "row",
           alignItems: "center",
+          gap: 10,
         }}
       >
-        <Ionicons name="people" color={AppColors.Red} />
-        <AppText style={{ color: colors.text, marginLeft: 6 }}>
+        <Ionicons name="people" color={AppColors.Red} size={16} />
+        <AppText style={textStyles.body}>
           {event.interestedPeople} interested
         </AppText>
       </View>

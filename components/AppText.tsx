@@ -1,14 +1,18 @@
+import { useTextStyles } from '@/constants/TextStyles';
 import React from 'react';
-import { Text, StyleSheet, TextProps } from 'react-native';
+import { Text, StyleSheet, TextProps, TextStyle } from 'react-native';
 
 interface AppTextProps extends TextProps {
   children?: React.ReactNode;
+  style?: TextStyle | TextStyle[];
 }
 
-const AppText: React.FC<AppTextProps> = (props) => {
+const AppText: React.FC<AppTextProps> = ({ children, style, ...rest }) => {
+  const textStyles = useTextStyles();
+
   return (
-    <Text style={[styles.defaultFont, props.style]} {...props}>
-      {props.children}
+    <Text style={[styles.defaultFont, textStyles.default, style]} {...rest}>
+      {children}
     </Text>
   );
 };

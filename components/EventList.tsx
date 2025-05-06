@@ -25,14 +25,10 @@ export default function EventListSection({
 
   return (
     <>
-      <AppText
-        style={{ ...textStyles.heading }}
-      >
-        {title}
-      </AppText>
+      <AppText style={{ ...textStyles.heading }}>{title}</AppText>
       <View>
         {events.length === 0 && (
-          <AppText style={{ color: colors.textSecondary, marginTop: 10 }}>
+          <AppText style={{ ...textStyles.subheading, marginTop: 10 }}>
             {emptyMessage}
           </AppText>
         )}
@@ -62,8 +58,8 @@ export default function EventListSection({
                 <Image
                   source={{ uri: event.thumbnailUri }}
                   style={{
-                    width: 40,
-                    height: 40,
+                    width: 60,
+                    height: 60,
                     borderRadius: 4,
                     marginRight: 10,
                   }}
@@ -71,8 +67,8 @@ export default function EventListSection({
               ) : (
                 <View
                   style={{
-                    width: 40,
-                    height: 40,
+                    width: 60,
+                    height: 60,
                     borderRadius: 4,
                     marginRight: 10,
                     backgroundColor: colors.border,
@@ -82,30 +78,20 @@ export default function EventListSection({
                 >
                   <Ionicons
                     name="image-outline"
-                    size={20}
+                    size={24}
                     color={colors.textSecondary}
                   />
                 </View>
               )}
               <View style={{ flex: 1 }}>
-                <AppText style={textStyles.bodyEmphasized} numberOfLines={1}>
+                <AppText style={{...textStyles.bodyEmphasized, marginBottom: 6}}>
                   {event.name}
                 </AppText>
-                <AppText
-                  style={[
-                    textStyles.body,
-                    { color: colors.textSecondary, fontSize: 12 },
-                  ]}
-                >
+                <AppText style={textStyles.secondary}>
                   <Ionicons name="time-outline" size={12} />{" "}
                   {dayjs(event.date).format("h:mm A")}
                 </AppText>
-                <AppText
-                  style={[
-                    textStyles.body,
-                    { color: colors.textSecondary, fontSize: 12 },
-                  ]}
-                >
+                <AppText style={textStyles.secondary}>
                   <Ionicons name="location-outline" size={12} />{" "}
                   {event.locationName || "No location"}
                 </AppText>

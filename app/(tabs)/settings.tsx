@@ -5,10 +5,15 @@ import AppColors from '@/constants/AppColors';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '@/components/AppText';
 import { useTextStyles } from '@/constants/TextStyles';
+import { useLayoutEffect } from 'react';
+import { useNavigation } from 'expo-router';
+import LineIcon from '@/assets/images/LineIcon';
+import Header from '@/components/Header';
 
 export default function SettingsScreen() {
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const textStyles = useTextStyles();
+  const navigation = useNavigation();
 
   const handleResetDatabase = () => {
     Alert.alert(
@@ -54,6 +59,12 @@ export default function SettingsScreen() {
       Alert.alert("Error", "Failed to fetch database contents.");
     }
   };
+  
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => (<Header headerText="SETTINGS"/>)
+    });
+  }, [navigation]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

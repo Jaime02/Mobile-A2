@@ -10,27 +10,24 @@ export const useTextStyles = () => {
       color: colors.text,
     },
     heading: {
-      fontSize: 24,
+      fontSize: 32,
       color: colors.text,
     },
     subheading: {
-      fontSize: 18,
+      fontSize: 24,
       color: colors.text,
     },
     body: {
-      fontSize: 16,
+      fontSize: 20,
       color: colors.text,
     },
     bodyEmphasized: {
-      fontSize: 16,
+      fontSize: 22,
       color: AppColors.Red,
-    },
-    small: {
-      fontSize: 14,
-      color: colors.text,
     },
     secondary: {
       color: colors.textSecondary,
+      fontSize: 16
     }
   });
 }; 
