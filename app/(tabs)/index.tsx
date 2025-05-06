@@ -37,15 +37,29 @@ export default function Index() {
     () => [...events].sort(sortByPopularity).slice(0, 6),
     [events]
   );
+
   const todayEvents: Event[] = useMemo(
     () => events.filter((e) => e.date.startsWith(today)).sort(sortByPopularity),
     [events, today]
   );
+
   const tomorrowEvents: Event[] = useMemo(
     () =>
       events.filter((e) => e.date.startsWith(tomorrow)).sort(sortByPopularity),
     [events, tomorrow]
   );
+
+  // Memoize upcoming events (not in today or tomorrow)
+  const upcomingEvents: Event[] = useMemo(() => {
+    // Create a set of IDs for events already displayed
+    const displayedEventIds = new Set([
+      ...todayEvents.map(event => event.id),
+      ...tomorrowEvents.map(event => event.id),
+    ]);
+
+    // Filter out events whose IDs are in the displayedEventIds set
+    return events.filter(event => !displayedEventIds.has(event.id));
+  }, [events, todayEvents, tomorrowEvents]);
 
   const loadEvents = useCallback(async () => {
     try {
@@ -221,6 +235,11 @@ export default function Index() {
         title="Tomorrow"
         events={tomorrowEvents}
         emptyMessage="No events tomorrow."
+      />
+      <EventListSection
+        title="Upcoming events"
+        events={upcomingEvents}
+        emptyMessage="No upcoming events."
       />
     </ScrollView>
   );
